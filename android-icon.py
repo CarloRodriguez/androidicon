@@ -33,6 +33,20 @@ else:
     img = sys.argv[2]
     resFolder = sys.argv[3]
 
+drawableFolders = [resFolder + '/drawable-ldpi/',
+                   resFolder + '/drawable-mdpi/',
+                   resFolder + '/drawable-hdpi/',
+                   resFolder + '/drawable-xhdpi/',
+                   resFolder + '/drawable-xxhdpi/',
+                   resFolder + '/drawable-xxxhdpi/']
+
+mipmapFolders = [resFolder + '/mipmap-ldpi/',
+                 resFolder + '/mipmap-mdpi/',
+                 resFolder + '/mipmap-hdpi/',
+                 resFolder + '/mipmap-xhdpi/',
+                 resFolder + '/mipmap-xxhdpi/',
+                 resFolder + '/mipmap-xxxhdpi/']
+
 command = 'convert --version'
 output = subprocess.call(command, shell=True)
 if output != 0:
@@ -46,33 +60,34 @@ def getFileName(prefix):
     iconName = raw_input('Icon name (avoid prefix and file extension): ')
     iconFileName = prefix + '_' + iconName + '.png'
 
+
+def getBaselineAsset():
+    global baselineAsset
+    while True:
+        try:
+            baselineAsset = int(raw_input('Desired baseline (i.e. 48): '))
+            break
+        except ValueError:
+            print "Oops! That was no valid number. Try again..."
+
+folder = drawableFolders
+
 if iconType == 'launcher':
-    folder = [resFolder + '/mipmap-ldpi/',
-              resFolder + '/mipmap-mdpi/',
-              resFolder + '/mipmap-hdpi/',
-              resFolder + '/mipmap-xhdpi/',
-              resFolder + '/mipmap-xxhdpi/',
-              resFolder + '/mipmap-xxxhdpi/']
+    folder = mipmapFolders
     baselineAsset = 48
     iconFileName = 'ic_launcher.png'
 elif iconType == 'stat_notify':
-    folder = [resFolder + '/drawable-ldpi/',
-              resFolder + '/drawable-mdpi/',
-              resFolder + '/drawable-hdpi/',
-              resFolder + '/drawable-xhdpi/',
-              resFolder + '/drawable-xxhdpi/',
-              resFolder + '/drawable-xxxhdpi/']
     baselineAsset = 24
     getFileName('ic_stat_notify')
 elif iconType == 'menu':
-    folder = [resFolder + '/drawable-ldpi/',
-              resFolder + '/drawable-mdpi/',
-              resFolder + '/drawable-hdpi/',
-              resFolder + '/drawable-xhdpi/',
-              resFolder + '/drawable-xxhdpi/',
-              resFolder + '/drawable-xxxhdpi/']
     baselineAsset = 32
     getFileName('ic_menu')
+elif iconType == 'dialog':
+    baselineAsset = 32
+    getFileName('ic_dialog')
+elif iconType == 'generic':
+    getBaselineAsset()
+    getFileName('ic')
 else:
     print '\nIcon type not available'
     exit()
