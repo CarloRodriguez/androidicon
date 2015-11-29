@@ -17,7 +17,9 @@ instructions += 'Icon type options:\n'
 instructions += 'launcher    -> Launcher icons\n'
 instructions += 'stat_notify -> Status bar icons\n'
 instructions += 'menu        -> Menu icons and Action Bar icons\n'
-instructions += '\n\nThe recommended image input size is at least 512x512'
+instructions += 'dialog      -> Dialog icons\n'
+instructions += 'generic     -> Generic icons (can specify baseline)\n'
+instructions += '\nThe recommended image input size is at least 512x512'
 
 if len(sys.argv) == 1:
     print instructions
