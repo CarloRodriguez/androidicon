@@ -73,7 +73,7 @@ class androidicon:
             imageSize = subprocess.check_output(['identify', '-format',
                                                  '"%wx%h"', self.img])
         except:
-            exit('Something went wrong')
+            exit("Something went wrong: can't verify image input size.")
         sizes = imageSize.split('x')
         if int(sizes[0][1:]) < 512:
             exit('Image input size should be at least 512x512')
