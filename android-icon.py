@@ -1,61 +1,63 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import sys
 import subprocess
 from itertools import izip
+import argparse
+from argparse import RawTextHelpFormatter
+import os
 
-img = ''
-resFolder = ''
-iconType = ''
+description = 'Create Android icons\n'
+description += 'android-icon [icon type] [image input] [res folder]\n\n'
+description += 'Icon type options:\n'
+description += 'launcher    -> Launcher icons\n'
+description += 'stat_notify -> Status bar icons\n'
+description += 'menu        -> Menu icons and Action Bar icons\n'
+description += 'dialog      -> Dialog icons\n'
+description += 'generic     -> Generic icons (can specify baseline)\n'
+description += '\nThe recommended image input size is at least 512x512'
+
+parser = argparse.ArgumentParser(description=description,
+                                 formatter_class=RawTextHelpFormatter)
+parser.add_argument("type",
+                    choices=["launcher", "stat_notify", "menu", "dialog",
+                             "generic"],
+                    help="Icon type")
+parser.add_argument("image",
+                    help="Image input")
+parser.add_argument("directory",
+                    help="res/ directory",
+                    action="store")
+args = parser.parse_args()
+
+iconType = args.type
+img = args.image
+resDir = os.path.join(args.directory, '')
+
+drawableFolders = [resDir + 'drawable-ldpi/',
+                   resDir + 'drawable-mdpi/',
+                   resDir + 'drawable-hdpi/',
+                   resDir + 'drawable-xhdpi/',
+                   resDir + 'drawable-xxhdpi/',
+                   resDir + 'drawable-xxxhdpi/']
+
+mipmapFolders = [resDir + 'mipmap-ldpi/',
+                 resDir + 'mipmap-mdpi/',
+                 resDir + 'mipmap-hdpi/',
+                 resDir + 'mipmap-xhdpi/',
+                 resDir + 'mipmap-xxhdpi/',
+                 resDir + 'mipmap-xxxhdpi/']
+
 baselineAsset = 0
 iconFileName = ''
 
-instructions = 'Create Android icons\n'
-instructions += 'android-icon.py [icon type] [image input] [res folder]\n\n'
-instructions += 'Icon type options:\n'
-instructions += 'launcher    -> Launcher icons\n'
-instructions += 'stat_notify -> Status bar icons\n'
-instructions += 'menu        -> Menu icons and Action Bar icons\n'
-instructions += 'dialog      -> Dialog icons\n'
-instructions += 'generic     -> Generic icons (can specify baseline)\n'
-instructions += '\nThe recommended image input size is at least 512x512'
-
-if len(sys.argv) == 1:
-    print instructions
-    exit()
-elif len(sys.argv) > 4:
-    print 'Invalid argument\n'
-    print instructions
-    exit()
-else:
-    iconType = sys.argv[1]
-    img = sys.argv[2]
-    resFolder = sys.argv[3]
-
-drawableFolders = [resFolder + '/drawable-ldpi/',
-                   resFolder + '/drawable-mdpi/',
-                   resFolder + '/drawable-hdpi/',
-                   resFolder + '/drawable-xhdpi/',
-                   resFolder + '/drawable-xxhdpi/',
-                   resFolder + '/drawable-xxxhdpi/']
-
-mipmapFolders = [resFolder + '/mipmap-ldpi/',
-                 resFolder + '/mipmap-mdpi/',
-                 resFolder + '/mipmap-hdpi/',
-                 resFolder + '/mipmap-xhdpi/',
-                 resFolder + '/mipmap-xxhdpi/',
-                 resFolder + '/mipmap-xxxhdpi/']
-
-command = 'convert --version'
-output = subprocess.call(command, shell=True)
+output = subprocess.call('convert --version', shell=True)
 if output != 0:
     print 'Please install ImageMagick'
     exit()
 
 
 def getFileName(prefix):
-    global iconName
     global iconFileName
     iconName = raw_input('Icon name (avoid prefix and file extension): ')
     iconFileName = prefix + '_' + iconName + '.png'
@@ -65,15 +67,15 @@ def getBaselineAsset():
     global baselineAsset
     while True:
         try:
-            baselineAsset = int(raw_input('Desired baseline (i.e. 48): '))
+            baselineAsset = int(raw_input('Desired baseline (e.g. 48): '))
             break
         except ValueError:
             print "Oops! That was no valid number. Try again..."
 
-folder = drawableFolders
+folders = drawableFolders
 
 if iconType == 'launcher':
-    folder = mipmapFolders
+    folders = mipmapFolders
     baselineAsset = 48
     iconFileName = 'ic_launcher.png'
 elif iconType == 'stat_notify':
@@ -92,11 +94,11 @@ else:
     print '\nIcon type not available'
     exit()
 
-for s in folder:
-    command = 'mkdir -p %s' % s
+for folder in folders:
+    command = 'mkdir -p %s' % folder
     output = subprocess.call(command, shell=True)
     if output != 0:
-        print 'Somenthig went wrong'
+        print "Something went wrong: can't create directories."
         exit()
 
 size = [str(baselineAsset * 0.75) + 'x' + str(baselineAsset * 0.75),
@@ -106,12 +108,12 @@ size = [str(baselineAsset * 0.75) + 'x' + str(baselineAsset * 0.75),
         str(baselineAsset * 3) + 'x' + str(baselineAsset * 3),
         str(baselineAsset * 4) + 'x' + str(baselineAsset * 4)]
 
-for x, y in izip(size, folder):
+for x, y in izip(size, folders):
     command = 'convert %s -resize %s %s' % (img, x,
                                             y + iconFileName)
     output = subprocess.call(command, shell=True)
     if output != 0:
-        print 'Somenthig went wrong'
+        print "Something went wrong: can't resize images."
         exit()
 
-print 'Complete'
+print 'Complete!'
