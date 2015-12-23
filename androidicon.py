@@ -64,14 +64,16 @@ class androidicon:
         print "Complete!"
 
     def verifyImageMagickInstallation(self):
-        output = subprocess.call('convert --version', shell=True)
+        output = subprocess.call('convert -version', shell=True)
         if output != 0:
-            print 'Please install ImageMagick'
-            exit()
+            exit('Please install ImageMagick.')
 
     def verifyImageInputSize(self):
-        imageSize = subprocess.check_output(['identify', '-format', '"%wx%h"',
-                                             self.img])
+        try:
+            imageSize = subprocess.check_output(['identify', '-format',
+                                                 '"%wx%h"', self.img])
+        except:
+            exit('Something went wrong')
         sizes = imageSize.split('x')
         if int(sizes[0][1:]) < 512:
             exit('Image input size should be at least 512x512')
