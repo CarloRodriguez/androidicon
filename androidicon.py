@@ -12,14 +12,17 @@ class androidicon:
     'Create Android Icons'
     def __init__(self):
         self.description = 'Create Android icons\n'
-        self.description += 'androidicon [icon type] [image input] [res folder]\n\n'
+        self.description += ('androidicon [icon type] [image input] '
+                             '[res directory]\n\n')
         self.description += 'Icon type options:\n'
         self.description += 'launcher    -> Launcher icons\n'
         self.description += 'stat_notify -> Status bar icons\n'
         self.description += 'menu        -> Menu icons and Action Bar icons\n'
         self.description += 'dialog      -> Dialog icons\n'
-        self.description += 'generic     -> Generic icons (can specify baseline)\n'
-        self.description += '\nThe recommended image input size is at least 512x512'
+        self.description += ('generic     -> Generic icons '
+                             '(can specify baseline)\n')
+        self.description += ('\nThe recommended image input size is at least '
+                             '512x512')
         parser = argparse.ArgumentParser(description=self.description,
                                          formatter_class=RawTextHelpFormatter)
         parser.add_argument("type",
@@ -92,7 +95,9 @@ class androidicon:
     def getBaselineAsset(self):
         while True:
             try:
-                self.baselineAsset = int(raw_input('Desired baseline (e.g. 48): '))
+                self.baselineAsset = int(
+                    raw_input('Desired baseline (e.g. 48): ')
+                )
                 break
             except ValueError:
                 print "Oops! That was no valid number. Try again..."
