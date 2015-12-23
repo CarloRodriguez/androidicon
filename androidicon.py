@@ -56,16 +56,27 @@ class androidicon:
         self.createAndroidIcon()
 
     def createAndroidIcon(self):
-        self.checkImageMagickInstallation()
+        self.verifyImageMagickInstallation()
+        self.verifyImageInputSize()
         self.getIconInfo()
         self.createResDirectories()
         self.createIcons()
+        print "Complete!"
 
-    def checkImageMagickInstallation(self):
+    def verifyImageMagickInstallation(self):
         output = subprocess.call('convert --version', shell=True)
         if output != 0:
             print 'Please install ImageMagick'
             exit()
+
+    def verifyImageInputSize(self):
+        imageSize = subprocess.check_output(['identify', '-format', '"%wx%h"',
+                                             self.img])
+        sizes = imageSize.split('x')
+        if int(sizes[0][1:]) < 512:
+            exit('Image input size should be at least 512x512')
+        elif int(sizes[1][:-1]) < 512:
+            exit('Image input size should be at least 512x512')
 
     def getIconInfo(self):
         if self.iconType == 'launcher':
