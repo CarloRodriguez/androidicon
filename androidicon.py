@@ -21,6 +21,7 @@ class androidicon:
         self.description += 'stat_notify -> Status bar icons\n'
         self.description += 'menu        -> Menu icons and Action Bar icons\n'
         self.description += 'dialog      -> Dialog icons\n'
+        self.description += 'fab         -> Floating action button icons\n'
         self.description += ('generic     -> Generic icons '
                              '(can specify baseline)\n')
         self.description += ('\nThe recommended image input size is at least '
@@ -29,7 +30,7 @@ class androidicon:
                                          formatter_class=RawTextHelpFormatter)
         parser.add_argument("type",
                             choices=["launcher", "stat_notify", "menu",
-                                     "dialog", "generic"],
+                                     "dialog", "fab", "generic"],
                             help="Icon type")
         parser.add_argument("image",
                             help="Image input")
@@ -87,6 +88,9 @@ class androidicon:
         elif self.iconType == 'dialog':
             self.baselineAsset = 32
             self.getFileName('ic_dialog')
+        elif self.iconType == 'fab':
+            self.baselineAsset = 32
+            self.getFileName('ic_fab')
         elif self.iconType == 'generic':
             self.getBaselineAsset()
             self.getFileName('ic')
