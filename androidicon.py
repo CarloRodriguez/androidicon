@@ -6,6 +6,8 @@ from itertools import izip
 import argparse
 from argparse import RawTextHelpFormatter
 import os
+import PIL
+from PIL import Image
 
 
 class androidicon:
@@ -37,6 +39,7 @@ class androidicon:
         args = parser.parse_args()
         self.iconType = args.type
         self.img = args.image
+        self.im = None
         self.resDir = os.path.join(args.directory, '')
         self.drawableFolders = [self.resDir + 'drawable-ldpi/',
                                 self.resDir + 'drawable-mdpi/',
@@ -56,29 +59,19 @@ class androidicon:
         self.createAndroidIcon()
 
     def createAndroidIcon(self):
-        self.verifyImageMagickInstallation()
         self.verifyImageInputSize()
         self.getIconInfo()
         self.createResDirectories()
         self.createIcons()
         print "Complete!"
 
-    def verifyImageMagickInstallation(self):
-        output = subprocess.call('convert -version', shell=True)
-        if output != 0:
-            exit('Please install ImageMagick.')
-
     def verifyImageInputSize(self):
-        try:
-            imageSize = subprocess.check_output(['identify', '-format',
-                                                 '"%wx%h"', self.img])
-        except:
-            exit("Something went wrong: can't verify image input size.")
-        sizes = imageSize.split('x')
-        if int(sizes[0][1:]) < 512:
+        self.im = Image.open(self.img)
+        width, height = self.im.size
+        if width < 512 or height < 512:
             exit('Image input size should be at least 512x512')
-        elif int(sizes[1][:-1]) < 512:
-            exit('Image input size should be at least 512x512')
+        if width != height:
+            exit('Image input should have same width and height')
 
     def getIconInfo(self):
         if self.iconType == 'launcher':
@@ -124,24 +117,19 @@ class androidicon:
                 exit()
 
     def createIcons(self):
-        size = [str(self.baselineAsset * 0.75) + 'x'
-                + str(self.baselineAsset * 0.75),
-                str(self.baselineAsset * 1) + 'x'
-                + str(self.baselineAsset * 1),
-                str(self.baselineAsset * 1.5) + 'x'
-                + str(self.baselineAsset * 1.5),
-                str(self.baselineAsset * 2) + 'x'
-                + str(self.baselineAsset * 2),
-                str(self.baselineAsset * 3) + 'x'
-                + str(self.baselineAsset * 3),
-                str(self.baselineAsset * 4) + 'x'
-                + str(self.baselineAsset * 4)]
-        for x, y in izip(size, self.folders):
-            command = 'convert %s -resize %s %s' % (self.img, x,
-                                                    y + self.iconFileName)
-            output = subprocess.call(command, shell=True)
-            if output != 0:
-                print "Something went wrong: can't resize images."
-                exit()
+        sizes = [
+            0.75,
+            1,
+            1.5,
+            2,
+            3,
+            4
+        ]
+        for size, folder in izip(sizes, self.folders):
+            tmpim = self.im.resize((
+                int(self.baselineAsset * size),
+                int(self.baselineAsset * size)
+            ), PIL.Image.ANTIALIAS)
+            tmpim.save(folder + self.iconFileName)
 
 androidicon = androidicon()
