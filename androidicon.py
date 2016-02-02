@@ -1,7 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import subprocess
 from itertools import izip
 import argparse
 from argparse import RawTextHelpFormatter
@@ -114,11 +113,8 @@ class androidicon:
 
     def createResDirectories(self):
         for folder in self.folders:
-            command = 'mkdir -p %s' % folder
-            output = subprocess.call(command, shell=True)
-            if output != 0:
-                print "Something went wrong: can't create res directories."
-                exit()
+            if not os.path.exists(os.path.join(os.getcwd(), folder)):
+                os.makedirs(os.path.join(os.getcwd(), folder))
 
     def createIcons(self):
         sizes = [
